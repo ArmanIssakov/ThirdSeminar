@@ -1,41 +1,33 @@
 package kz.arman.ThirdSeminar;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 
+/*
+    Добавление задачи.
+    Просмотр всех задач.
+    Просмотр задач по статусу (например, "завершена", "в процессе", "не начата").
+    Изменение статуса задачи.
+    Удаление задачи.*/
 @Service
 public class TaskService {
-    private final List<Task> tasks = new ArrayList<>();
-
-    public List<Task> getAllTasks() {
-        return tasks;
-    }
-
-    public Task getTask(UUID uuid) {
-        return  tasks.stream()
-                .filter(t -> t.getId().equals(uuid))
-                .findFirst()
-                .orElse(null);
-    }
+    @Autowired
+    private TaskRepository taskRepository;
 
     public Task addTask(Task task) {
-        tasks.add(task);
-        return task;
+        task.setEndTime(LocalDateTime.now());
+        return taskRepository.save(task);
     }
 
-    public void deleteTask(UUID uuid) {
-        tasks.removeIf(t -> t.getId().equals(uuid));
+    public List<Task> showAllTasks() {
+        return taskRepository.findAll();
     }
 
-    public Task updateTask(UUID uuid, Task task) {
-        Task task1 = getTask(uuid);
-        if (task1 != null) {
-            task1.setDescription(task.getDescription());
-            task1.setName(task.getName());
-        }
-        return task1;
+    public void deleteTask(Long id) {
+        taskRepository.deleteById(id);
     }
+
 }
